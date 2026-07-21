@@ -91,7 +91,7 @@ export const coverUpData: CoverUpItem[] = [
     title: 'Projeto Renascimento',
     beforeImage: '/tattoo/antes_cobertura.png', // Exemplo conceitual do relógio antigo
     afterImage: '/tattoo/adepois_cobertura.png',             // Cobertura da Malenia por cima
-    description: 'Trabalho de blocagem estratégica e sombreamento pesado para cobrir completamente a escrita e o relógio antigos, sem deixar rastros.'
+    description: 'Trabalho orgânico estratégico e sombreamento pesado para cobrir completamente o giz e a escrita antigos, sem deixar rastros.'
   }
 ];
 
