@@ -1,27 +1,61 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { portfolioData, TattooItem } from '../../lib/data';
 import { cn } from '../../lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { sanityClient, urlFor } from '../../lib/sanity';
+
+// Interface ajustada para os dados vindo do Sanity
+export interface SanityTattoo {
+  _id: string;
+  title: string;
+  category: string;
+  image: any;
+  featured?: boolean;
+  description?: string;
+}
 
 export default function BentoGallery() {
+  const [tattoos, setTattoos] = useState<SanityTattoo[]>([]);
+  const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState<string>('all');
-  const [selectedTattoo, setSelectedTattoo] = useState<TattooItem | null>(null);
-  
-  // Referência para controlar a rolagem do carrossel via botões
+  const [selectedTattoo, setSelectedTattoo] = useState<SanityTattoo | null>(null);
+
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  const filteredTattoos = activeCategory === 'all'
-    ? portfolioData
-    : portfolioData.filter(item => item.category === activeCategory);
+  // Busca as artes cadastradas no Sanity Studio ao carregar
+  useEffect(() => {
+    const fetchTattoos = async () => {
+      try {
+        const query = `*[_type == "tattoo"] | order(_createdAt desc) {
+          _id,
+          title,
+          category,
+          image,
+          featured,
+          description
+        }`;
+        const data = await sanityClient.fetch(query);
+        setTattoos(data);
+      } catch (error) {
+        console.error('Erro ao carregar galeria do Sanity:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // Função para rolar o carrossel manualmente
+    fetchTattoos();
+  }, []);
+
+  const filteredTattoos = activeCategory === 'all'
+    ? tattoos
+    : tattoos.filter(item => item.category === activeCategory);
+
   const handleScroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
       const { scrollLeft, clientWidth } = scrollContainerRef.current;
-      const scrollAmount = clientWidth * 0.75; // Rola 75% da largura visível
+      const scrollAmount = clientWidth * 0.75;
       scrollContainerRef.current.scrollTo({
         left: direction === 'left' ? scrollLeft - scrollAmount : scrollLeft + scrollAmount,
         behavior: 'smooth',
@@ -32,7 +66,7 @@ export default function BentoGallery() {
   return (
     <section id="portfolio" className="relative py-20 px-4 max-w-7xl mx-auto overflow-hidden">
       
-      {/* ─── ELEMENTO STAR WARS SLOW FLYBY (FUNDO) ─── */}
+      {/* ─── ELEMENTO STAR WARS (FUNDO) ─── */}
       <div className="absolute inset-0 z-0 pointer-events-none select-none overflow-hidden opacity-10">
         <motion.svg
           animate={{ x: [-100, 1200], y: [0, 50] }}
@@ -48,7 +82,7 @@ export default function BentoGallery() {
       </div>
 
       <div className="relative z-10">
-        {/* Cabeçalho da Seção com Controles do Carrossel */}
+        {/* Cabeçalho */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-6">
           <div className="text-center md:text-left">
             <span className="text-xs font-mono tracking-widest text-icy uppercase">
@@ -57,12 +91,12 @@ export default function BentoGallery() {
             <h2 className="text-3xl md:text-4xl font-mono font-black mt-1 tracking-tight uppercase">
               Galeria de <span className="text-icy">Artes</span>
             </h2>
-            <p className="text-zinc-400 max-w-md text-sm mt-1">
+            <p className="text-zinc-400 max-w-md text-sm mt-1 font-sans">
               Deslize para explorar. Clique no card para expandir o traço e ver em alta resolução.
             </p>
           </div>
 
-          {/* Botões de Navegação Manual (Setas) */}
+          {/* Setas de Navegação */}
           <div className="hidden sm:flex items-center justify-center gap-3">
             <button
               onClick={() => handleScroll('left')}
@@ -104,46 +138,58 @@ export default function BentoGallery() {
           ))}
         </div>
 
-        {/* ─── CARROSSEL INTERATIVO COM MODO BENTO ─── */}
-        <div
-          ref={scrollContainerRef}
-          className="flex gap-4 overflow-x-auto pb-6 scrollbar-none snap-x snap-mandatory scroll-smooth"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-        >
-          {filteredTattoos.map((tattoo: TattooItem) => (
-            <div
-              key={tattoo.id}
-              onClick={() => setSelectedTattoo(tattoo)}
-              className={cn(
-                "snap-start flex-shrink-0 relative overflow-hidden rounded-2xl bg-studio-900 border border-studio-800 group transition-all duration-500 cursor-zoom-in hover:border-icy hover:shadow-[0_0_25px_rgba(0,102,255,0.3)]",
-                // Mantém o visual Bento proporcional: Destaque fica mais largo
-                tattoo.featured 
-                  ? "w-[300px] sm:w-[480px] h-[360px]" 
-                  : "w-[260px] sm:w-[320px] h-[360px]"
-              )}
-            >
-              <Image
-                src={tattoo.imagePath}
-                alt={tattoo.title}
-                fill
-                sizes="(max-width: 768px) 100vw, 50vw"
-                className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                priority={tattoo.featured}
+        {/* Loading State Skeleton */}
+        {loading ? (
+          <div className="flex gap-4 overflow-hidden py-4">
+            {[1, 2, 3, 4].map((n) => (
+              <div
+                key={n}
+                className="w-[280px] h-[360px] rounded-2xl bg-studio-900/60 border border-studio-800 animate-pulse flex-shrink-0"
               />
+            ))}
+          </div>
+        ) : (
+          /* ─── CARROSSEL INTERATIVO COM IMAGENS DO SANITY ─── */
+          <div
+            ref={scrollContainerRef}
+            className="flex gap-4 overflow-x-auto pb-6 scrollbar-none snap-x snap-mandatory scroll-smooth"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {filteredTattoos.map((tattoo) => (
+              <div
+                key={tattoo._id}
+                onClick={() => setSelectedTattoo(tattoo)}
+                className={cn(
+                  "snap-start flex-shrink-0 relative overflow-hidden rounded-2xl bg-studio-900 border border-studio-800 group transition-all duration-500 cursor-zoom-in hover:border-icy hover:shadow-[0_0_25px_rgba(0,102,255,0.3)]",
+                  tattoo.featured 
+                    ? "w-[300px] sm:w-[480px] h-[360px]" 
+                    : "w-[260px] sm:w-[320px] h-[360px]"
+                )}
+              >
+                {tattoo.image && (
+                  <Image
+                    src={urlFor(tattoo.image).width(800).url()}
+                    alt={tattoo.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                  />
+                )}
 
-              {/* Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-studio-950 via-studio-950/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-6 flex flex-col justify-end">
-                <span className="text-[10px] font-mono uppercase tracking-wider text-icy font-bold">
-                  // {tattoo.category.replace('-', ' ')}
-                </span>
-                <h3 className="text-base font-mono font-bold text-zinc-50 mt-1">{tattoo.title}</h3>
+                {/* Overlay com Título e Categoria */}
+                <div className="absolute inset-0 bg-gradient-to-t from-studio-950 via-studio-950/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-6 flex flex-col justify-end">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-icy font-bold">
+                    // {tattoo.category.replace('-', ' ')}
+                  </span>
+                  <h3 className="text-base font-mono font-bold text-zinc-50 mt-1">{tattoo.title}</h3>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* ─── MODAL DE ZOOM DINÂMICO (LIGHTBOX) ─── */}
+      {/* ─── MODAL DE ZOOM DINÂMICO ─── */}
       <AnimatePresence>
         {selectedTattoo && (
           <motion.div
@@ -166,13 +212,15 @@ export default function BentoGallery() {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="relative w-full h-full">
-                <Image
-                  src={selectedTattoo.imagePath}
-                  alt={selectedTattoo.title}
-                  fill
-                  className="object-contain"
-                  quality={95}
-                />
+                {selectedTattoo.image && (
+                  <Image
+                    src={urlFor(selectedTattoo.image).width(1600).url()}
+                    alt={selectedTattoo.title}
+                    fill
+                    className="object-contain"
+                    quality={95}
+                  />
+                )}
               </div>
 
               <div className="absolute -bottom-12 left-0 right-0 text-center">
@@ -186,9 +234,9 @@ export default function BentoGallery() {
         )}
       </AnimatePresence>
 
-      {filteredTattoos.length === 0 && (
+      {!loading && filteredTattoos.length === 0 && (
         <div className="text-center py-12 text-zinc-500 text-xs font-mono uppercase">
-          [ Nenhuma tatuagem cadastrada nesta categoria ainda ]
+          [ Nenhuma tatuagem cadastrada nesta categoria no Sanity ainda ]
         </div>
       )}
     </section>

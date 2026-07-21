@@ -48,6 +48,7 @@ export default function ContactForm() {
     try {
       let uploadedImageUrl = '';
 
+      // 1. Upload da imagem caso tenha sido selecionada
       if (file) {
         const uploadFormData = new FormData();
         uploadFormData.append('file', file);
@@ -63,6 +64,7 @@ export default function ContactForm() {
         }
       }
 
+      // 2. Mapeamento dos estilos
       const styleLabels: Record<string, string> = {
         'anime-geek': 'Anime & Geek (Manga) 🌸',
         'ornamental-flow': 'Ornamental & Flow (Fineline) ✨',
@@ -70,10 +72,10 @@ export default function ContactForm() {
         'cover-up': 'Cobertura (Cover-up) 🔄',
       };
 
-      // Limpa a unidade 'cm' duplicada caso o usuário já tenha digitado
+      // Trata a string do tamanho para não duplicar 'cm'
       const cleanSize = formData.size.toLowerCase().replace('cm', '').trim();
 
-      // Montamos o texto em UTF-8 bem estruturado
+      // 3. Montagem do texto em UTF-8
       const messageLines = [
         `✨ *NOVO PROJETO VIA SITE* ✨\n`,
         `👤 *Cliente:* ${formData.name}`,
@@ -88,16 +90,32 @@ export default function ContactForm() {
       }
 
       const messageText = messageLines.join('\n');
+      const phone = '559299810140'; // Substituir pelo número oficial da Aline
 
-      // Usar encodeURIComponent de forma segura com encodeURI garante os emojis em UTF-8
-      const phone = '559299810140'; // Número da Aline
-      const whatsappUrl = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(messageText)}`;
+      // 4. Detecção de Mobile para usar o protocolo ideal sem bloqueio de Pop-up
+      const encodedText = encodeURIComponent(messageText);
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      
+      // No mobile, wa.me redireciona direto pro App sem ser bloqueado
+      const whatsappUrl = isMobile 
+        ? `https://wa.me/${phone}?text=${encodedText}`
+        : `https://api.whatsapp.com/send?phone=${phone}&text=${encodedText}`;
 
       setSuccess(true);
-      window.open(whatsappUrl, '_blank');
 
+      // Limpa os estados do formulário
       setFormData({ name: '', style: 'anime-geek', placement: '', size: '', description: '' });
       setFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+
+      // 5. Redirecionamento imune a bloqueios de pop-up no celular
+      if (isMobile) {
+        window.location.href = whatsappUrl;
+      } else {
+        window.open(whatsappUrl, '_blank');
+      }
 
     } catch (error) {
       console.error('Erro ao processar orçamento:', error);
