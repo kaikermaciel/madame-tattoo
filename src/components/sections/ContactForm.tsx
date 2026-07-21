@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import { cn } from '../../lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
+import CustomSelect, { SelectOption } from '../ui/CustomSelect';
 
 export default function ContactForm() {
   const [loading, setLoading] = useState(false);
@@ -10,7 +11,6 @@ export default function ContactForm() {
   const [file, setFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  // 1. Removido o campo 'whatsapp' do estado inicial
   const [formData, setFormData] = useState({
     name: '',
     style: 'anime-geek',
@@ -19,18 +19,23 @@ export default function ContactForm() {
     description: '',
   });
 
+  const styleOptions: SelectOption[] = [
+    { value: 'anime-geek', label: 'Anime & Geek (Manga) 🌸' },
+    { value: 'ornamental-flow', label: 'Ornamental & Flow (Fineline) ✨' },
+    { value: 'blackwork-bold', label: 'Blackwork & Bold 🦅' },
+    { value: 'cover-up', label: 'Cobertura (Cover-up) 🔄' },
+  ];
+
   const handleReset = () => {
-    // Limpa o input do navegador
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-    // Limpa os estados do React
     setFile(null);
     setFormData({ name: '', style: 'anime-geek', placement: '', size: '', description: '' });
     setSuccess(false);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -48,7 +53,6 @@ export default function ContactForm() {
     try {
       let uploadedImageUrl = '';
 
-      // 1. Upload da imagem caso tenha sido selecionada
       if (file) {
         const uploadFormData = new FormData();
         uploadFormData.append('file', file);
@@ -64,7 +68,6 @@ export default function ContactForm() {
         }
       }
 
-      // 2. Mapeamento dos estilos
       const styleLabels: Record<string, string> = {
         'anime-geek': 'Anime & Geek (Manga) 🌸',
         'ornamental-flow': 'Ornamental & Flow (Fineline) ✨',
@@ -72,10 +75,8 @@ export default function ContactForm() {
         'cover-up': 'Cobertura (Cover-up) 🔄',
       };
 
-      // Trata a string do tamanho para não duplicar 'cm'
       const cleanSize = formData.size.toLowerCase().replace('cm', '').trim();
 
-      // 3. Montagem do texto em UTF-8
       const messageLines = [
         `✨ *NOVO PROJETO VIA SITE* ✨\n`,
         `👤 *Cliente:* ${formData.name}`,
@@ -90,27 +91,23 @@ export default function ContactForm() {
       }
 
       const messageText = messageLines.join('\n');
-      const phone = '559299810140'; // Substituir pelo número oficial da Aline
+      const phone = '559299810140';
 
-      // 4. Detecção de Mobile para usar o protocolo ideal sem bloqueio de Pop-up
       const encodedText = encodeURIComponent(messageText);
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
       
-      // No mobile, wa.me redireciona direto pro App sem ser bloqueado
       const whatsappUrl = isMobile 
         ? `https://wa.me/${phone}?text=${encodedText}`
         : `https://api.whatsapp.com/send?phone=${phone}&text=${encodedText}`;
 
       setSuccess(true);
 
-      // Limpa os estados do formulário
       setFormData({ name: '', style: 'anime-geek', placement: '', size: '', description: '' });
       setFile(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
 
-      // 5. Redirecionamento imune a bloqueios de pop-up no celular
       if (isMobile) {
         window.location.href = whatsappUrl;
       } else {
@@ -127,13 +124,13 @@ export default function ContactForm() {
   return (
     <section id="orcamento" className="relative py-20 px-4 max-w-4xl mx-auto overflow-hidden">
       
-      {/* Elementos Star Wars de Fundo Sutil */}
+      {/* Elementos de Fundo */}
       <div className="absolute inset-0 z-0 pointer-events-none select-none overflow-hidden opacity-5">
         <div className="absolute inset-0 bg-[radial-gradient(1.5px_1.5px_at_20px_30px,#fff,transparent),radial-gradient(2px_2px_at_80px_120px,#0066FF,transparent)] bg-[size:300px_300px] opacity-30" />
       </div>
 
       <div className="max-w-4xl mx-auto relative z-10">
-        {/* Cabeçalho da Seção */}
+        {/* Cabeçalho */}
         <div className="text-center mb-12">
           <span className="text-xs font-mono tracking-widest text-icy uppercase">
             Agendamento & Projetos
@@ -179,7 +176,7 @@ export default function ContactForm() {
 
           <form onSubmit={handleSubmit} className={cn("space-y-6 relative z-10", success && "opacity-0 pointer-events-none")}>
             
-            {/* Linha 1: Nome (WhatsApp removido) */}
+            {/* Linha 1: Nome */}
             <div className="flex flex-col space-y-2">
               <label htmlFor="name" className="text-xs font-mono tracking-wider text-zinc-400 uppercase">Seu Nome</label>
               <input
@@ -194,23 +191,16 @@ export default function ContactForm() {
               />
             </div>
 
-            {/* Linha 2: Estilo, Local do Corpo e Tamanho */}
+            {/* Linha 2: CustomSelect (Estilo), Local do Corpo e Tamanho */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="flex flex-col space-y-2">
-                <label htmlFor="style" className="text-xs font-mono tracking-wider text-zinc-400 uppercase">Estilo da Tattoo 🌸</label>
-                <select
-                  id="style"
-                  name="style"
-                  value={formData.style}
-                  onChange={handleChange}
-                  className="bg-studio-950 border border-studio-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none focus:border-icy/50 transition-colors duration-300 text-sm appearance-none cursor-pointer"
-                >
-                  <option value="anime-geek">Anime & Geek (Manga) 🌸</option>
-                  <option value="ornamental-flow">Ornamental & Flow (Fineline) ✨</option>
-                  <option value="blackwork-bold">Blackwork & Bold 🦅</option>
-                  <option value="cover-up">Cobertura (Cover-up) 🔄</option>
-                </select>
-              </div>
+              
+              {/* DROPDOWN CUSTOMIZADO INTEGRADO */}
+              <CustomSelect
+                label="ESTILO DA TATTOO 🌸"
+                options={styleOptions}
+                value={formData.style}
+                onChange={(selectedStyle) => setFormData((prev) => ({ ...prev, style: selectedStyle }))}
+              />
 
               <div className="flex flex-col space-y-2">
                 <label htmlFor="placement" className="text-xs font-mono tracking-wider text-zinc-400 uppercase">Local do Corpo 📍</label>
@@ -241,13 +231,13 @@ export default function ContactForm() {
               </div>
             </div>
 
-            {/* Linha 3: Campo de Upload de Referência / Foto do Corpo */}
+            {/* Linha 3: Upload de Referência */}
             <div className="flex flex-col space-y-2">
               <label htmlFor="file" className="text-xs font-mono tracking-wider text-zinc-400 uppercase">
                 Foto de Referência ou do Local do Corpo (Opcional) 🖼️
               </label>
               <input
-                ref={fileInputRef} // <-- Adicione a ref aqui!
+                ref={fileInputRef}
                 type="file"
                 id="file"
                 accept="image/*"
@@ -261,7 +251,7 @@ export default function ContactForm() {
               )}
             </div>
 
-            {/* Linha 4: Descrição da Ideia */}
+            {/* Linha 4: Descrição */}
             <div className="flex flex-col space-y-2">
               <label htmlFor="description" className="text-xs font-mono tracking-wider text-zinc-400 uppercase">Descrição da sua Ideia 📝</label>
               <textarea
