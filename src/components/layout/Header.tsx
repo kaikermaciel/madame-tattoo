@@ -40,14 +40,14 @@ export default function Header() {
         {/* LOGO AREA */}
         <a href="#" className="flex items-center gap-2 group">
           <div className="text-xs sm:text-sm font-black tracking-tighter text-zinc-50 uppercase flex items-center font-mono">
-            <span>MADAME.TATT</span>
+            <span>MADAME TATT</span>
             {/* Componente dos olhos interativos */}
             <AbelEyes />
           </div>
 
           <div className="hidden sm:flex flex-col border-l border-studio-800 pl-3">
-            <span className="text-[10px] font-bold tracking-widest text-zinc-50 uppercase font-mono">
-              MADAME
+            <span className="text-[10px] font-bold tracking-widest text-zinc-50 font-mono">
+              Aline Escossio
             </span>
             <span className="text-[8px] text-zinc-500 font-mono tracking-wider -mt-1">
               DESIGN AUTORAL
@@ -71,7 +71,7 @@ export default function Header() {
             href="#orcamento"
             className="bg-studio-900 border border-studio-800 text-zinc-200 font-mono text-xs tracking-wider uppercase px-4 py-2 rounded-xl transition-all duration-300 hover:border-icy hover:text-white hover:shadow-[0_0_20px_rgba(0,102,255,0.4)]"
           >
-            [ Orçamento ]
+            Orçamento
           </a>
         </nav>
 

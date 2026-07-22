@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Portfólio de Tattoo | Design Autoral & Coberturas",
+  title: "Madame Tattoo",
   description: "Estúdio especializado em tatuagens autorais, Fineline Ornamental, Blackwork Ilustrativo e coberturas (Cover-up). Venha fazer seu orçamento.",
 };
 

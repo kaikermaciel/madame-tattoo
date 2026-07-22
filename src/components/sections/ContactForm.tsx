@@ -5,6 +5,21 @@ import { cn } from '../../lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import CustomSelect, { SelectOption } from '../ui/CustomSelect';
 
+// Importação dos ícones profissionais
+import { 
+  FiUser, 
+  FiMapPin, 
+  FiMaximize2, 
+  FiUploadCloud, 
+  FiFileText, 
+  FiSend, 
+  FiCheckCircle, 
+  FiStar,
+  FiRepeat,
+  FiFeather,
+  FiCompass
+} from 'react-icons/fi';
+
 export default function ContactForm() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -19,11 +34,40 @@ export default function ContactForm() {
     description: '',
   });
 
+  // Opções do Select usando React Icons na Label do Site
   const styleOptions: SelectOption[] = [
-    { value: 'anime-geek', label: 'Anime & Geek (Manga) 🌸' },
-    { value: 'ornamental-flow', label: 'Ornamental & Flow (Fineline) ✨' },
-    { value: 'blackwork-bold', label: 'Blackwork & Bold 🦅' },
-    { value: 'cover-up', label: 'Cobertura (Cover-up) 🔄' },
+    { 
+      value: 'anime-geek', 
+      label: (
+        <span className="flex items-center gap-2">
+          <FiStar className="text-amber-400 text-xs" /> Anime & Geek (Manga)
+        </span>
+      ) as any 
+    },
+    { 
+      value: 'ornamental-flow', 
+      label: (
+        <span className="flex items-center gap-2">
+          <FiFeather className="text-icy text-xs" /> Ornamental & Flow (Fineline)
+        </span>
+      ) as any 
+    },
+    { 
+      value: 'blackwork-bold', 
+      label: (
+        <span className="flex items-center gap-2">
+          <FiCompass className="text-zinc-400 text-xs" /> Blackwork & Bold
+        </span>
+      ) as any 
+    },
+    { 
+      value: 'cover-up', 
+      label: (
+        <span className="flex items-center gap-2">
+          <FiRepeat className="text-emerald-400 text-xs" /> Cobertura (Cover-up)
+        </span>
+      ) as any 
+    },
   ];
 
   const handleReset = () => {
@@ -68,7 +112,8 @@ export default function ContactForm() {
         }
       }
 
-      const styleLabels: Record<string, string> = {
+      // MANTÉM OS EMOJIS NO MENSAGEIRO DO WHATSAPP
+      const styleLabelsForWhatsApp: Record<string, string> = {
         'anime-geek': 'Anime & Geek (Manga) 🌸',
         'ornamental-flow': 'Ornamental & Flow (Fineline) ✨',
         'blackwork-bold': 'Blackwork & Bold 🦅',
@@ -77,10 +122,11 @@ export default function ContactForm() {
 
       const cleanSize = formData.size.toLowerCase().replace('cm', '').trim();
 
+      // MENSAGEM DO WHATSAPP COM OS EMOJIS ORIGINAIS
       const messageLines = [
         `✨ *NOVO PROJETO VIA SITE* ✨\n`,
         `👤 *Cliente:* ${formData.name}`,
-        `🎨 *Estilo:* ${styleLabels[formData.style] || formData.style}`,
+        `🎨 *Estilo:* ${styleLabelsForWhatsApp[formData.style] || formData.style}`,
         `📍 *Local do Corpo:* ${formData.placement}`,
         `📏 *Tamanho Aprox.:* ${cleanSize}cm\n`,
         `📝 *Descrição da Ideia:*\n${formData.description}`
@@ -133,12 +179,12 @@ export default function ContactForm() {
         {/* Cabeçalho */}
         <div className="text-center mb-12">
           <span className="text-xs font-mono tracking-widest text-icy uppercase">
-            Agendamento & Projetos
+            // AGENDAMENTO & PROJETOS
           </span>
-          <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-4 tracking-tight">
+          <h2 className="text-3xl md:text-4xl font-mono font-black mt-2 mb-4 tracking-tight uppercase">
             Solicitar <span className="text-icy">Orçamento</span>
           </h2>
-          <p className="text-zinc-400 max-w-md mx-auto text-sm">
+          <p className="text-zinc-400 max-w-md mx-auto text-sm font-sans">
             Traga sua ideia. Preencha os campos abaixo para darmos início ao desenvolvimento do seu design exclusivo.
           </p>
         </div>
@@ -155,7 +201,7 @@ export default function ContactForm() {
                 className="absolute inset-0 bg-studio-900 flex flex-col items-center justify-center text-center py-8 space-y-4 rounded-3xl z-20 px-6"
               >
                 <div className="w-16 h-16 bg-icy/10 border border-icy/30 rounded-full flex items-center justify-center mx-auto text-icy text-2xl shadow-[0_0_15px_rgba(0,102,255,0.1)]">
-                  ✓
+                  <FiCheckCircle />
                 </div>
                 <h3 className="text-xl font-bold text-zinc-50">Redirecionando para o WhatsApp!</h3>
                 <p className="text-sm text-zinc-400 max-w-sm mx-auto">
@@ -178,7 +224,9 @@ export default function ContactForm() {
             
             {/* Linha 1: Nome */}
             <div className="flex flex-col space-y-2">
-              <label htmlFor="name" className="text-xs font-mono tracking-wider text-zinc-400 uppercase">Seu Nome</label>
+              <label htmlFor="name" className="text-xs font-mono tracking-wider text-zinc-400 uppercase flex items-center gap-2">
+                <FiUser className="text-icy text-xs" /> Seu Nome
+              </label>
               <input
                 required
                 type="text"
@@ -187,23 +235,25 @@ export default function ContactForm() {
                 value={formData.name}
                 onChange={handleChange}
                 placeholder="Ex: Seu Nome"
-                className="bg-studio-950 border border-studio-800 rounded-xl px-4 py-3 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-icy/50 transition-colors duration-300 text-sm"
+                className="bg-studio-950 border border-studio-800 rounded-xl px-4 py-3 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-icy/50 transition-colors duration-300 text-sm font-sans"
               />
             </div>
 
             {/* Linha 2: CustomSelect (Estilo), Local do Corpo e Tamanho */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               
-              {/* DROPDOWN CUSTOMIZADO INTEGRADO */}
+              {/* DROPDOWN CUSTOMIZADO COM REACT ICONS */}
               <CustomSelect
-                label="ESTILO DA TATTOO 🌸"
+                label="ESTILO DA TATTOO"
                 options={styleOptions}
                 value={formData.style}
                 onChange={(selectedStyle) => setFormData((prev) => ({ ...prev, style: selectedStyle }))}
               />
 
               <div className="flex flex-col space-y-2">
-                <label htmlFor="placement" className="text-xs font-mono tracking-wider text-zinc-400 uppercase">Local do Corpo 📍</label>
+                <label htmlFor="placement" className="text-xs font-mono tracking-wider text-zinc-400 uppercase flex items-center gap-2">
+                  <FiMapPin className="text-icy text-xs" /> Local do Corpo
+                </label>
                 <input
                   required
                   type="text"
@@ -212,12 +262,14 @@ export default function ContactForm() {
                   value={formData.placement}
                   onChange={handleChange}
                   placeholder="Ex: Antebraço, Costelas..."
-                  className="bg-studio-950 border border-studio-800 rounded-xl px-4 py-3 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-icy/50 transition-colors duration-300 text-sm"
+                  className="bg-studio-950 border border-studio-800 rounded-xl px-4 py-3 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-icy/50 transition-colors duration-300 text-sm font-sans"
                 />
               </div>
 
               <div className="flex flex-col space-y-2">
-                <label htmlFor="size" className="text-xs font-mono tracking-wider text-zinc-400 uppercase">Tamanho aprox. (em cm) 📏</label>
+                <label htmlFor="size" className="text-xs font-mono tracking-wider text-zinc-400 uppercase flex items-center gap-2">
+                  <FiMaximize2 className="text-icy text-xs" /> Tamanho aprox. (cm)
+                </label>
                 <input
                   required
                   type="text"
@@ -226,15 +278,15 @@ export default function ContactForm() {
                   value={formData.size}
                   onChange={handleChange}
                   placeholder="Ex: 15cm"
-                  className="bg-studio-950 border border-studio-800 rounded-xl px-4 py-3 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-icy/50 transition-colors duration-300 text-sm"
+                  className="bg-studio-950 border border-studio-800 rounded-xl px-4 py-3 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-icy/50 transition-colors duration-300 text-sm font-sans"
                 />
               </div>
             </div>
 
             {/* Linha 3: Upload de Referência */}
             <div className="flex flex-col space-y-2">
-              <label htmlFor="file" className="text-xs font-mono tracking-wider text-zinc-400 uppercase">
-                Foto de Referência ou do Local do Corpo (Opcional) 🖼️
+              <label htmlFor="file" className="text-xs font-mono tracking-wider text-zinc-400 uppercase flex items-center gap-2">
+                <FiUploadCloud className="text-icy text-xs" /> Foto de Referência / Pele (Opcional)
               </label>
               <input
                 ref={fileInputRef}
@@ -245,7 +297,7 @@ export default function ContactForm() {
                 className="bg-studio-950 border border-studio-800 rounded-xl px-4 py-2.5 text-zinc-400 text-xs file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-mono file:bg-studio-800 file:text-zinc-200 hover:file:bg-studio-700 cursor-pointer transition-colors duration-300"
               />
               {file && (
-                <span className="text-[10px] font-mono text-icy">
+                <span className="text-[10px] font-mono text-icy flex items-center gap-1">
                   ✓ Arquivo selecionado: {file.name}
                 </span>
               )}
@@ -253,7 +305,9 @@ export default function ContactForm() {
 
             {/* Linha 4: Descrição */}
             <div className="flex flex-col space-y-2">
-              <label htmlFor="description" className="text-xs font-mono tracking-wider text-zinc-400 uppercase">Descrição da sua Ideia 📝</label>
+              <label htmlFor="description" className="text-xs font-mono tracking-wider text-zinc-400 uppercase flex items-center gap-2">
+                <FiFileText className="text-icy text-xs" /> Descrição da sua Ideia
+              </label>
               <textarea
                 required
                 id="description"
@@ -261,8 +315,8 @@ export default function ContactForm() {
                 rows={4}
                 value={formData.description}
                 onChange={handleChange}
-                placeholder="Conte detalhadamente o que você quer tatuar, use emojis se quiser 📝. Tem elementos específicos, cores ou se é uma cobertura..."
-                className="bg-studio-950 border border-studio-800 rounded-xl px-4 py-3 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-icy/50 transition-colors duration-300 text-sm resize-none"
+                placeholder="Conte detalhadamente o que você quer tatuar. Tem elementos específicos, cores ou se é uma cobertura..."
+                className="bg-studio-950 border border-studio-800 rounded-xl px-4 py-3 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-icy/50 transition-colors duration-300 text-sm resize-none font-sans"
               />
             </div>
 
@@ -272,10 +326,11 @@ export default function ContactForm() {
                 disabled={loading}
                 type="submit"
                 className={cn(
-                  "w-full bg-studio-900 border border-studio-700 text-zinc-200 font-bold py-4 px-6 rounded-xl text-xs font-mono tracking-widest uppercase transition-all duration-300 hover:border-icy hover:text-white hover:shadow-[0_0_30px_rgba(0,102,255,0.45)] hover:bg-studio-900/90",
+                  "w-full bg-studio-900 border border-studio-700 text-zinc-200 font-bold py-4 px-6 rounded-xl text-xs font-mono tracking-widest uppercase transition-all duration-300 hover:border-icy hover:text-white hover:shadow-[0_0_30px_rgba(0,102,255,0.45)] hover:bg-studio-900/90 flex items-center justify-center gap-2",
                   loading && "opacity-50 cursor-not-allowed"
                 )}
               >
+                <FiSend className="text-sm" />
                 {loading ? '[ COMPRIMINDO IMAGEM & ENVIANDO... ]' : 'Enviar Proposta no WhatsApp'}
               </button>
             </div>
