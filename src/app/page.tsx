@@ -4,6 +4,7 @@ import ContactForm from "../components/sections/ContactForm";
 import CoverUpSlider from "../components/sections/CoverUpSlider";
 import CreationProcess from "../components/sections/CreationProcess";
 import Hero from "../components/sections/Hero";
+import { Analytics } from "@vercel/analytics/next"
 
 export default function Home() {
   return (
@@ -16,7 +17,7 @@ export default function Home() {
       </div>
 
       {/* Renderizando a nossa galeria Bento */}
-      
+      <Analytics />
       <AboutArtist />
       <BentoGallery />
       <CoverUpSlider />
