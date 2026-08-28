@@ -5,6 +5,7 @@ import CoverUpSlider from "../components/sections/CoverUpSlider";
 import CreationProcess from "../components/sections/CreationProcess";
 import Hero from "../components/sections/Hero";
 import { Analytics } from "@vercel/analytics/next"
+import TattooGenerator from "../components/sections/TattooGenerator";
 
 export default function Home() {
   return (

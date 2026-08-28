@@ -5,8 +5,8 @@ import Footer from "../components/layout/Footer"; // 1. Importa o Footer aqui
 import GalaxyBackground from "../components/layout/GalaxyBackground";
 import BoiCaprichosoEasterEgg from "../components/layout/BoiCaprichosoEasterEgg";
 import "./globals.css";
-import { SpeedInsights } from "@vercel/speed-insights/nuxt/runtime";
-import { Analytics } from "@vercel/analytics/nuxt/runtime";
+import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
