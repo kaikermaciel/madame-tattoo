@@ -6,6 +6,7 @@ import CreationProcess from "../components/sections/CreationProcess";
 import Hero from "../components/sections/Hero";
 import { Analytics } from "@vercel/analytics/next"
 import TattooGenerator from "../components/sections/TattooGenerator";
+import FloatingCTA from "../components/ui/FloatingCTA";
 
 export default function Home() {
   return (
@@ -24,6 +25,7 @@ export default function Home() {
       <CoverUpSlider />
       <CreationProcess />
       <ContactForm />
+      <FloatingCTA/>
       
       {/* As outras seções (About, CoverUp, Contact) vão entrar aqui embaixo */}
     </main>

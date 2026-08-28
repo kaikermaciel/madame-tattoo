@@ -11,37 +11,53 @@ export default function Header() {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 20) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
+      setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const navLinks = [
-    { label: 'Galeria', href: '#portfolio', tag: '01' },
+    { label: 'Galeria', href: '#galeria', altHref: '#portfolio', tag: '01' },
     { label: 'Coberturas', href: '#coberturas', tag: '02' },
     { label: 'O Processo', href: '#processo', tag: '03' },
   ];
 
+  // Função para fechar o menu e rolar com precisão para a seção
+  const handleScrollTo = (e: React.MouseEvent<HTMLAnchorElement>, href: string, altHref?: string) => {
+    e.preventDefault();
+    setMobileMenuOpen(false);
+
+    // Busca pelo ID principal ou alternativo (ex: #galeria ou #portfolio)
+    const target = document.querySelector(href) || (altHref ? document.querySelector(altHref) : null);
+    
+    if (target) {
+      setTimeout(() => {
+        target.scrollIntoView({ behavior: 'smooth' });
+      }, 50);
+    }
+  };
+
   return (
     <header
       className={cn(
-        // Removido qualquer backdrop-blur/transparência. Fixado bg-black (preto puro opaco)
         "fixed top-0 left-0 right-0 z-50 transition-colors duration-300 border-b bg-black border-studio-800/80 shadow-[0_4px_25px_rgba(0,0,0,0.95)]"
       )}
     >
-      {/* BARRA SUPERIOR FIXA DO HEADER (PRETO SÓLIDO OPACO) */}
+      {/* BARRA SUPERIOR FIXA DO HEADER */}
       <div className="max-w-7xl mx-auto px-4 h-16 sm:h-20 flex items-center justify-between relative z-20 bg-black">
         
         {/* LOGO AREA */}
-        <a href="#" className="flex items-center gap-2 group">
+        <a 
+          href="#" 
+          onClick={(e) => {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          className="flex items-center gap-2 group"
+        >
           <div className="text-xs sm:text-sm font-black tracking-tighter text-zinc-50 uppercase flex items-center font-mono">
             <span>MADAME TATT</span>
-            {/* Componente dos olhos interativos */}
             <AbelEyes />
           </div>
 
@@ -61,6 +77,7 @@ export default function Header() {
             <a
               key={link.label}
               href={link.href}
+              onClick={(e) => handleScrollTo(e, link.href, link.altHref)}
               className="text-xs uppercase font-mono tracking-wider text-zinc-400 hover:text-white transition-colors duration-300"
             >
               {link.label}
@@ -69,6 +86,7 @@ export default function Header() {
           
           <a
             href="#orcamento"
+            onClick={(e) => handleScrollTo(e, '#orcamento')}
             className="bg-studio-900 border border-studio-800 text-zinc-200 font-mono text-xs tracking-wider uppercase px-4 py-2 rounded-xl transition-all duration-300 hover:border-icy hover:text-white hover:shadow-[0_0_20px_rgba(0,102,255,0.4)]"
           >
             Orçamento
@@ -88,7 +106,7 @@ export default function Header() {
 
       </div>
 
-      {/* ─── GAVETA DROPDOWN PRETO SÓLIDO (100% OPACO) ─── */}
+      {/* ─── GAVETA DROPDOWN MOBILE ─── */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
@@ -107,7 +125,7 @@ export default function Header() {
                 <a
                   key={link.label}
                   href={link.href}
-                  onClick={() => setMobileMenuOpen(false)}
+                  onClick={(e) => handleScrollTo(e, link.href, link.altHref)}
                   className="flex items-center justify-between p-3.5 rounded-xl bg-studio-900 border border-studio-800 text-zinc-100 active:border-icy transition-all"
                 >
                   <span className="font-mono text-xs uppercase tracking-wider font-bold">
@@ -122,7 +140,7 @@ export default function Header() {
               <div className="pt-2">
                 <a
                   href="#orcamento"
-                  onClick={() => setMobileMenuOpen(false)}
+                  onClick={(e) => handleScrollTo(e, '#orcamento')}
                   className="block w-full text-center bg-icy text-studio-950 font-mono font-bold text-xs tracking-widest uppercase py-3.5 rounded-xl transition-all shadow-[0_0_15px_rgba(0,102,255,0.3)]"
                 >
                   Solicitar Orçamento
