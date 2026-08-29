@@ -54,7 +54,7 @@ export default function Footer() {
           </h4>
           <div className="flex flex-col space-y-2">
             <a 
-              href="https://www.instagram.com/alline.tatto?igsh=d3g4MnI5NmY3enlr" 
+              href="https://www.instagram.com/madame.tatt0.0?igsh=d3g4MnI5NmY3enlr" 
               target="_blank" 
               rel="noopener noreferrer" 
               className="hover:text-icy transition-colors duration-300 flex items-center gap-2"
